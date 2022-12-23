@@ -1,0 +1,2 @@
+repo: "git@github.com:Jose077/CrudDeploy001.git"
+dest: "/home/ubuntu/app"

@@ -1,9 +1,14 @@
-# Ambiente with: nodejs; git; docker; 
+# Ambiente with: nodejs; git; docker;
+
 - hosts: ambiente-NodeJS-aws
+  vars_files:
+    - vars/default.yml
   become: yes
   gather_facts: false
 
   tasks:
+
+  # Docker
   - name: Install docker packages
     remote_user: ubuntu
     apt:
@@ -69,3 +74,26 @@
       url : https://github.com/docker/compose/releases/download/1.29.2/docker-compose-Linux-x86_64
       dest: /usr/local/bin/docker-compose
       mode: 'u+x,g+x'
+
+ 
+  # Git
+  - name: Copy ssh file
+    ansible.builtin.copy:
+      src: ./ssh-keys/id_rsa
+      dest: ~/.ssh/id_rsa
+      owner: ubuntu
+      group: ubuntu
+
+  - name: ensure git pkg installed
+    ansible.builtin.apt:
+      name: git
+      state: present
+      update_cache: true
+
+  - name: add github to known hosts
+    shell: "ssh-keyscan -t rsa github.com >> ~/.ssh/known_hosts"
+
+  - name: Clone the repo app
+    ansible.builtin.git:
+        repo: "{{ repo }}"
+        dest: "{{ dest }}"
