@@ -75,7 +75,7 @@
       dest: /usr/local/bin/docker-compose
       mode: 'u+x,g+x'
 
- 
+      
   # Git
   - name: Copy ssh file
     ansible.builtin.copy:
@@ -97,3 +97,33 @@
     ansible.builtin.git:
         repo: "{{ repo }}"
         dest: "{{ dest }}"
+
+  # Nginx
+  - name: ensure nginx is at the latest version
+    apt: name=nginx state=latest
+
+  - name: start nginx
+    service:
+        name: nginx
+        state: started
+
+  - name: copy the local nginx config file and restart nginx
+    copy:
+      src: ./nginx/static_site.cfg
+      dest: /etc/nginx/sites-available/static_site.cfg
+
+  - name: create symlink
+    file:
+      src: /etc/nginx/sites-available/static_site.cfg
+      dest: /etc/nginx/sites-enabled/default
+      state: link
+  - name: restart nginx
+    service:
+      name: nginx
+      state: restarted
+
+  # api
+  - name: execute api
+    ansible.builtin.shell:
+      cmd: cd app, docker-compose build, docker-compose up -d
+
