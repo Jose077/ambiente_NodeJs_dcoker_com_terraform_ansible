@@ -124,6 +124,5 @@
 
   # api
   - name: execute api
-    ansible.builtin.shell:
-      cmd: cd app, docker-compose build, docker-compose up -d
+    ansible.builtin.shell: 'cd app; docker-compose build; docker-compose up -d'
 
